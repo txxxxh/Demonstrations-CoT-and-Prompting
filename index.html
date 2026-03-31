@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tianxiao H. — Academic Homepage</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #1a1a18;
+      --ink-light: #4a4a46;
+      --ink-faint: #8a8a84;
+      --paper: #f7f5f0;
+      --paper-warm: #f0ede6;
+      --rule: #d8d4cc;
+      --accent: #2a4a7f;
+      --accent-light: #e8eef7;
+      --serif: 'EB Garamond', Georgia, serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 17px;
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .page-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ── Top rule ── */
+    .top-rule {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent) 60%, var(--rule) 100%);
+    }
+
+    /* ── Nav ── */
+    nav {
+      border-bottom: 1px solid var(--rule);
+      padding: 0.9rem 0;
+    }
+
+    nav .page-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-name {
+      font-size: 0.85rem;
+      font-family: var(--mono);
+      color: var(--ink-light);
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.85rem;
+      font-family: var(--mono);
+      color: var(--ink-light);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* ── Hero / Profile ── */
+    .hero {
+      padding: 5rem 0 4rem;
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .hero-text h1 {
+      font-size: 2.8rem;
+      font-weight: 500;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.3rem;
+    }
+
+    .hero-text h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-affiliation {
+      font-size: 1rem;
+      color: var(--ink-light);
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+    }
+
+    .hero-affiliation span {
+      display: block;
+    }
+
+    .hero-bio {
+      font-size: 1.05rem;
+      color: var(--ink);
+      max-width: 56ch;
+      margin-bottom: 2rem;
+    }
+
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      color: var(--ink-light);
+      text-decoration: none;
+      background: white;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .hero-links a:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .hero-links a svg {
+      flex-shrink: 0;
+    }
+
+    /* Avatar */
+    .hero-avatar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      padding-top: 0.5rem;
+    }
+
+    .avatar-frame {
+      width: 160px;
+      height: 160px;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--rule);
+      background: var(--paper-warm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      color: var(--ink-faint);
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      text-align: center;
+    }
+
+    .avatar-placeholder svg {
+      opacity: 0.4;
+    }
+
+    /* ── Section ── */
+    section {
+      padding: 3.5rem 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: 1.45rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .section-rule {
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ── About ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 4rem;
+    }
+
+    .about-body p {
+      margin-bottom: 1.1rem;
+      font-size: 1.02rem;
+    }
+
+    .about-sidebar h3 {
+      font-size: 0.82rem;
+      font-family: var(--mono);
+      color: var(--ink-faint);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .interest-list {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+
+    .interest-list li {
+      font-size: 0.92rem;
+      color: var(--ink-light);
+      padding: 0.25rem 0;
+      border-bottom: 1px solid var(--paper-warm);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .interest-list li::before {
+      content: '◆';
+      font-size: 0.4rem;
+      color: var(--accent);
+    }
+
+    .edu-item {
+      margin-bottom: 1.2rem;
+    }
+
+    .edu-degree {
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
+
+    .edu-school {
+      font-size: 0.85rem;
+      color: var(--ink-light);
+    }
+
+    .edu-year {
+      font-size: 0.8rem;
+      font-family: var(--mono);
+      color: var(--ink-faint);
+    }
+
+    /* ── Publications ── */
+    .pub-filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.25rem 0.85rem;
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      border: 1px solid var(--rule);
+      background: white;
+      color: var(--ink-light);
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+      letter-spacing: 0.03em;
+    }
+
+    .filter-btn.active,
+    .filter-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .pub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .pub-item {
+      padding: 1.6rem 0;
+      border-bottom: 1px solid var(--paper-warm);
+      display: grid;
+      grid-template-columns: 3rem 1fr;
+      gap: 1.2rem;
+      align-items: start;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .pub-item:first-child {
+      border-top: 1px solid var(--paper-warm);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .pub-year {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--ink-faint);
+      padding-top: 0.15rem;
+      text-align: right;
+    }
+
+    .pub-content {}
+
+    .pub-title {
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 0.3rem;
+      line-height: 1.4;
+    }
+
+    .pub-authors {
+      font-size: 0.88rem;
+      color: var(--ink-light);
+      margin-bottom: 0.3rem;
+    }
+
+    .pub-authors strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .pub-venue {
+      font-size: 0.88rem;
+      font-style: italic;
+      color: var(--ink-light);
+      margin-bottom: 0.7rem;
+    }
+
+    .pub-venue .venue-name {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    .pub-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .badge {
+      padding: 0.15rem 0.55rem;
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      border-radius: 2px;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-oral {
+      background: #fdf3e7;
+      color: #b05a00;
+      border: 1px solid #f5d9b0;
+    }
+
+    .badge-spotlight {
+      background: #edf3fd;
+      color: var(--accent);
+      border: 1px solid #c5d5f0;
+    }
+
+    .badge-best {
+      background: #f0faf3;
+      color: #1a6b35;
+      border: 1px solid #b0dfc0;
+    }
+
+    .pub-links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .pub-link {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0.1rem 0;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    .pub-link:hover {
+      border-bottom-color: var(--accent);
+    }
+
+    .pub-link+.pub-link::before {
+      content: '/';
+      margin-right: 0.5rem;
+      color: var(--rule);
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--rule);
+      padding: 2rem 0 3rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-family: var(--mono);
+      color: var(--ink-faint);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .hero-avatar {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .avatar-frame {
+        width: 100px;
+        height: 100px;
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="top-rule"></div>
+
+  <nav>
+    <div class="page-wrap">
+      <a href="#" class="nav-name">T. H.</a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#publications">Publications</a></li>
+        <li><a href="mailto:tongxh1204@gmail.com">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <div class="page-wrap">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Xuhan <em>Tong</em></h1>
+        <div class="hero-affiliation">
+          <span>Undergraduate Student</span>
+          <span>Weiyang College</span>
+          <span>Tsinghua University</span>
+        </div>
+        <p class="hero-bio">
+          I am a undergraduate student in Tsinghua University.
+          My research focuses on Machine Learning, with particular interest in
+          stability and generalization.
+        </p>
+        <div class="hero-links">
+          <a href="mailto:tongxh1204@gmail.com">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+            </svg>
+            Email
+          </a>
+          <a href="https://github.com/txxxxh" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
+            </svg>
+            GitHub
+          </a>
+          <a href="https://scholar.google.com/citations?user=ujzdY7cAAAAJ&hl=zh-CN&oi=sra" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <path d="M12 17h.01" />
+            </svg>
+            Google Scholar
+          </a>
+          <a href="cv.pdf" target="_blank">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14,2 14,8 20,8" />
+            </svg>
+            CV / Résumé
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-avatar">
+        <div class="avatar-frame">
+          <img src="photo.jpg" alt="Xuhan Tong" style="width:100%;height:100%;object-fit:cover;" />
+        </div>
+        <span style="color:var(--ink-light);font-size:0.75rem;">Email: tongxh1204@gmail.com</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- ── About ── -->
+  <div class="page-wrap">
+    <section id="about">
+      <div class="section-header">
+        <h2 class="section-title">About</h2>
+        <div class="section-rule"></div>
+      </div>
+      <div class="about-grid">
+        <div class="about-body">
+          <p>
+            I am broadly interested in Machine Learning. My current work investigates
+            LLM stability and generalization.
+            Currently, I am a undergraduate student at Tsinghua University, majoring in software engineering &
+            mathematical basic sciences.
+          </p>
+          <p>
+            During my studies, I have had the opportunity to be a research intern at the
+            University of Wisconsin-Madison. I am fortunate to be advised by
+            Prof. Jiawei Zhang.
+          </p>
+          <p>
+            Feel free to reach out — I am always happy to discuss research ideas or collaborations.
+          </p>
+        </div>
+        <div class="about-sidebar">
+          <h3>Research Interests</h3>
+          <ul class="interest-list">
+            <li>In-context Learning theory</li>
+            <li>LLM hallucination</li>
+            <li>Topic Area Three</li>
+          </ul>
+          <h3>Education</h3>
+          <div class="edu-item">
+            <div class="edu-degree">Undergraduate in Software Engineering & Mathematical Basic Sciences</div>
+            <div class="edu-school">Tsinghua University</div>
+            <div class="edu-year">2023 — Present</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── Publications ── -->
+  <div class="page-wrap">
+    <section id="publications">
+      <div class="section-header">
+        <h2 class="section-title">Publications</h2>
+        <div class="section-rule"></div>
+      </div>
+
+      <div class="pub-filters">
+        <button class="filter-btn active" onclick="filterPubs('all', this)">All</button>
+        <button class="filter-btn" onclick="filterPubs('2026', this)">2026</button>
+        <button class="filter-btn" onclick="filterPubs('2025', this)">2025</button>
+      </div>
+
+      <div class="pub-list" id="pub-list">
+
+        <div class="pub-item" data-year="2026">
+          <div class="pub-year">2026</div>
+          <div class="pub-content">
+            <div class="pub-title">Demonstrations, CoT, and Prompting: A Theoretical Analysis of ICL</div>
+            <div class="pub-authors"><strong>Xuhan Tong</strong>, Y. Zeng, J. Zhang</div>
+            <!-- <div class="pub-venue">In <span class="venue-name">Conference on [Topic] (CONF 2026)</span></div> -->
+            <div class="pub-links">
+              <a class="pub-link" href="https://arxiv.org/pdf/2603.19611">Paper</a>
+              <a class="pub-link" href="https://arxiv.org/pdf/2603.19611">arXiv</a>
+              <a class="pub-link" href="https://github.com/txxxxh/Demonstrations-CoT-and-Prompting">Code</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="page-wrap">
+      <div class="footer-inner">
+        <span>© 2025 Xuhan Tong</span>
+        <span>Last updated: <span id="last-updated">March 2025</span></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function filterPubs(year, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.pub-item').forEach(item => {
+        const match = year === 'all' || item.dataset.year === year;
+        item.style.display = match ? 'grid' : 'none';
+      });
+    }
+
+    // Set last updated date
+    const d = new Date();
+    document.getElementById('last-updated').textContent =
+      d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  </script>
+
+</body>
+
+</html>
