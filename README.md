@@ -88,21 +88,16 @@ This corresponds to Section 4 and 5.
 
 ---
 
-## Requirements
-
-The core dependencies include:
-
-- torch
-- transformers
-- peft
-- numpy
-
-Install via:
-
-pip install -r requirements.txt
-
----
-
 ## Citation
 
 If you find this work useful, please cite: 
+
+@misc{tong2026,
+      title={Demonstrations, CoT, and Prompting: A Theoretical Analysis of ICL}, 
+      author={Xuhan Tong and Yuchen Zeng and Jiawei Zhang},
+      year={2026},
+      eprint={2603.19611},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2603.19611}, 
+}
