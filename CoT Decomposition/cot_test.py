@@ -19,9 +19,6 @@ SYSTEM_PROMPT = (
 )
 
 
-# =========================
-# 数据结构
-# =========================
 @dataclass
 class Example:
     a: int
@@ -49,7 +46,7 @@ class EvalResult:
 
 
 # =========================
-# 两种 CoT 构造
+# two CoT desompositions
 # =========================
 def build_id_steps(a: int, b: int) -> Tuple[List[str], int]:
     """
@@ -82,7 +79,7 @@ def build_id_steps(a: int, b: int) -> Tuple[List[str], int]:
 def build_ood_steps(a: int, b: int) -> Tuple[List[str], int]:
     """
     Out-of-distribution decomposition:
-    要求 a,b 在 [1000000, 1999999]
+    a,b within [1000000, 1999999]
     Step 1: a = 1000000 + ra
     Step 2: b = 1000000 + rb
     Step 3: Add corresponding components: 1000000 + 1000000 = 2000000, ra + rb = sr
@@ -125,13 +122,9 @@ def build_example(a: int, b: int, cot_type: str) -> Example:
 
 
 # =========================
-# few-shot demo 池
+# few-shot demo pool
 # =========================
 def make_demo_pool(cot_type: str) -> List[Example]:
-    """
-    这里给出固定的 5 个 demo。
-    都限制在 1000000~1999999，方便两种 decomposition 都能用。
-    """
     demo_pairs = [
         (1234561, 1323212),
         (1456783, 1543206),
@@ -143,7 +136,7 @@ def make_demo_pool(cot_type: str) -> List[Example]:
 
 
 # =========================
-# 测试集生成
+# text examples
 # =========================
 def generate_test_examples(num_samples: int, cot_type: str, seed: int = 42) -> List[Example]:
     random.seed(seed)
@@ -156,7 +149,7 @@ def generate_test_examples(num_samples: int, cot_type: str, seed: int = 42) -> L
 
 
 # =========================
-# prompt 构造
+# prompt
 # =========================
 def format_demo(ex: Example) -> str:
     answer = "\n".join(ex.target_steps) + f"\nFinal Answer: {ex.target_final}"
@@ -207,7 +200,7 @@ def build_prompt(query_ex: Example, demos: List[Example]) -> str:
 
 
 # =========================
-# 模型加载
+# Load model
 # =========================
 def load_model_and_tokenizer(base_model: str, lora_path: str, device: str = "cuda"):
     tokenizer = AutoTokenizer.from_pretrained(base_model, use_fast=True, local_files_only=True)
@@ -226,7 +219,7 @@ def load_model_and_tokenizer(base_model: str, lora_path: str, device: str = "cud
 
 
 # =========================
-# 生成
+# generate
 # =========================
 @torch.no_grad()
 def generate_one(
@@ -256,7 +249,7 @@ def generate_one(
 
 
 # =========================
-# 解析与判分
+# evaluation
 # =========================
 def normalize_text(s: str) -> str:
     s = s.strip()
@@ -337,7 +330,7 @@ def evaluate_one_output(ex: Example, prompt: str, raw_output: str, n_shot: int) 
 
 
 # =========================
-# 汇总统计
+# summary
 # =========================
 def summarize_results(results: List[EvalResult], cot_type: str):
     subset = [r for r in results if r.cot_type == cot_type]
@@ -369,16 +362,16 @@ def summarize_results(results: List[EvalResult], cot_type: str):
 
 
 # =========================
-# 主程序
+# main
 # =========================
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model", type=str, default="llama3.2-3b")
-    parser.add_argument("--lora_path", type=str, default="llama3.2_lora_claude_final_final_0213")
+    parser.add_argument("--lora_path", type=str, default="your lora path")
     parser.add_argument("--num_test", type=int, default=35)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max_new_tokens", type=int, default=256)
-    parser.add_argument("--save_dir", type=str, default="cot_eval_results_llama3.2_lora_claude_final_final_0213")
+    parser.add_argument("--save_dir", type=str, default="your path")
     args = parser.parse_args()
 
     os.makedirs(args.save_dir, exist_ok=True)
@@ -416,13 +409,13 @@ def main():
             if (idx + 1) % 10 == 0:
                 print(f"[{cot_type}][{n_shot}-shot] done {idx + 1}/{len(test_examples)}")
 
-    # 保存明细
+
     detail_path = os.path.join(args.save_dir, "detail_results.jsonl")
     with open(detail_path, "w", encoding="utf-8") as f:
         for r in all_results:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
 
-    # 保存汇总
+
     summary = {
         "id": summarize_results(all_results, "id"),
         "ood": summarize_results(all_results, "ood"),
