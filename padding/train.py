@@ -87,16 +87,7 @@ def build_train_text(
     output: str,
     system: Optional[str] = None,
 ) -> str:
-    """
-    手动拼接训练文本，不使用 chat_template。
 
-    训练目标：
-    给定 System + User 部分，让模型续写 Assistant 后面的最终整数答案。
-
-    注意：
-    这里仍然采用 full causal LM loss，即 prompt 和 answer token 都参与 loss。
-    如果后面你想只对 answer 部分计算 loss，可以再改成 label masking 版本。
-    """
     sys_prompt = system if system else SYSTEM_PROMPT
 
     text = (
