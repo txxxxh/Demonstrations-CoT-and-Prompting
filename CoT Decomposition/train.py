@@ -39,11 +39,7 @@ def load_jsonl(path: str) -> List[Dict]:
 
 
 def build_train_text(question: str, answer: str, system: str = None) -> str:
-    """
-    不使用 chat_template，直接手动拼训练文本。
-    训练时让模型学习在 Question 后续写 Answer。
-    使用每条记录自带的 system prompt（如有），否则用默认。
-    """
+
     sys_prompt = system if system else SYSTEM_PROMPT
     text = (
         f"System: {sys_prompt}\n"
@@ -83,7 +79,7 @@ def print_trainable_parameters(model):
             trainable_params += param.numel()
 
     print("=" * 80)
-    print("模型参数统计")
+    print("model config")
     print(f"Trainable params: {trainable_params:,}")
     print(f"All params:       {all_param:,}")
     print(f"Trainable ratio:  {100 * trainable_params / all_param:.4f}%")
@@ -93,8 +89,8 @@ def print_trainable_parameters(model):
 def main():
     parser = argparse.ArgumentParser(description="LoRA fine-tune llama3.2-3b on 6-digit addition")
     parser.add_argument("--base_model", type=str, default="llama3.2-3b")
-    parser.add_argument("--train_file", type=str, default="train_add_mixed_24k_claude_final_final.jsonl")
-    parser.add_argument("--output_dir", type=str, default="llama3.2_lora_claude_final_final_0213")
+    parser.add_argument("--train_file", type=str, default="train_add_mixed.jsonl")
+    parser.add_argument("--output_dir", type=str, default="your path")
     parser.add_argument("--max_length", type=int, default=256)
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--grad_accum_steps", type=int, default=4)
@@ -103,22 +99,22 @@ def main():
     parser.add_argument("--logging_steps", type=int, default=10)
     parser.add_argument("--save_steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--use_4bit", action="store_true", help="是否使用 4bit QLoRA")
+    parser.add_argument("--use_4bit", action="store_true", help="4bit QLoRA")
     args = parser.parse_args()
 
     if not os.path.isdir(args.base_model):
         raise FileNotFoundError(
-            f"本地模型目录不存在: {args.base_model}"
+            f"no such directory: {args.base_model}"
         )
     if not os.path.isfile(os.path.join(args.base_model, "config.json")):
         raise FileNotFoundError(
-            f"{args.base_model} 下没有 config.json，这不是完整的本地模型目录"
+            f"{args.base_model} has no config.json"
         )
 
     os.makedirs(args.output_dir, exist_ok=True)
 
     print("=" * 80)
-    print("开始加载 tokenizer 和 model")
+    print("start loading tokenizer and model")
     print(f"Base model: {args.base_model}")
     print(f"Train file: {args.train_file}")
     print(f"Output dir: {args.output_dir}")
@@ -167,7 +163,7 @@ def main():
     if args.use_4bit:
         model = prepare_model_for_kbit_training(model)
 
-    # LoRA 配置
+    # LoRA
     lora_config = LoraConfig(
         r=16,
         lora_alpha=32,
@@ -188,12 +184,12 @@ def main():
     model = get_peft_model(model, lora_config)
     print_trainable_parameters(model)
 
-    # 读取训练数据
+
     train_records = load_jsonl(args.train_file)
     train_dataset = convert_records_to_text_dataset(train_records)
 
     print("=" * 80)
-    print("训练数据示例")
+    print("data example")
     print(train_dataset[0]["text"])
     print("=" * 80)
 
@@ -235,21 +231,21 @@ def main():
     )
 
     print("=" * 80)
-    print("开始训练")
+    print("start training")
     print("=" * 80)
 
     trainer.train()
 
     print("=" * 80)
-    print("保存 LoRA adapter")
+    print("save LoRA adapter")
     print("=" * 80)
 
     model.save_pretrained(args.output_dir)
     tokenizer.save_pretrained(args.output_dir)
 
     print("=" * 80)
-    print("训练完成")
-    print(f"LoRA adapter 已保存到: {args.output_dir}")
+    print("training finish")
+    print(f"LoRA adapter saved to: {args.output_dir}")
     print("=" * 80)
 
 
