@@ -19,9 +19,6 @@ SYSTEM_PROMPT = (
 )
 
 
-# =========================
-# 数据结构
-# =========================
 @dataclass
 class Example:
     a: int
@@ -47,7 +44,7 @@ class EvalResult:
     step_correct: List[int]
     final_correct: int
 
-    # 新增：step-wise confidence
+    # step-wise confidence
     step_logprobs: List[float]
     step_probs: List[float]
     step_raw_logits: List[float]
@@ -55,7 +52,7 @@ class EvalResult:
 
 
 # =========================
-# 两种 CoT 构造
+# two CoT decompositions
 # =========================
 def build_id_steps(a: int, b: int) -> Tuple[List[str], int]:
     """
@@ -88,7 +85,7 @@ def build_id_steps(a: int, b: int) -> Tuple[List[str], int]:
 def build_ood_steps(a: int, b: int) -> Tuple[List[str], int]:
     """
     Out-of-distribution decomposition:
-    要求 a,b 在 [1000000, 1999999]
+    a,b within [1000000, 1999999]
     Step 1: a = 1000000 + ra
     Step 2: b = 1000000 + rb
     Step 3: Add corresponding components: 1000000 + 1000000 = 2000000, ra + rb = sr
@@ -131,13 +128,10 @@ def build_example(a: int, b: int, cot_type: str) -> Example:
 
 
 # =========================
-# few-shot demo 池
+# few-shot demo pool
 # =========================
 def make_demo_pool(cot_type: str) -> List[Example]:
-    """
-    这里给出固定的 5 个 demo。
-    都限制在 1000000~1999999，方便两种 decomposition 都能用。
-    """
+
     demo_pairs = [
         (1234561, 1323212),
         (1456783, 1543206),
@@ -149,7 +143,7 @@ def make_demo_pool(cot_type: str) -> List[Example]:
 
 
 # =========================
-# 测试集生成
+# test examples
 # =========================
 def generate_test_examples(num_samples: int, cot_type: str, seed: int = 42) -> List[Example]:
     random.seed(seed)
@@ -162,7 +156,7 @@ def generate_test_examples(num_samples: int, cot_type: str, seed: int = 42) -> L
 
 
 # =========================
-# prompt 构造
+# prompt
 # =========================
 def format_demo(ex: Example) -> str:
     answer = "\n".join(ex.target_steps) + f"\nFinal Answer: {ex.target_final}"
@@ -213,7 +207,7 @@ def build_prompt(query_ex: Example, demos: List[Example]) -> str:
 
 
 # =========================
-# 模型加载
+# Load model
 # =========================
 def load_model_and_tokenizer(base_model: str, lora_path: str, device: str = "cuda"):
     tokenizer = AutoTokenizer.from_pretrained(base_model, use_fast=True, local_files_only=True)
@@ -232,7 +226,7 @@ def load_model_and_tokenizer(base_model: str, lora_path: str, device: str = "cud
 
 
 # =========================
-# 生成
+# generate
 # =========================
 @torch.no_grad()
 def generate_one(model, tokenizer, prompt, max_new_tokens=256):
@@ -253,12 +247,12 @@ def generate_one(model, tokenizer, prompt, max_new_tokens=256):
 
     new_token_ids = output_ids[0][inputs["input_ids"].shape[1]:]
     text = tokenizer.decode(new_token_ids, skip_special_tokens=True)
-    return text, new_token_ids          # <-- 同时返回 ids
+    return text, new_token_ids
 
 
 
 # =========================
-# 解析与判分
+# evaluation
 # =========================
 def normalize_text(s: str) -> str:
     s = s.strip()
@@ -314,12 +308,7 @@ def score_ood_steps(pred_steps: List[str], a: int, b: int) -> List[int]:
 # step-wise helper
 # =======================
 def extract_step_answer_spans(text: str) -> List[Tuple[str, int, int]]:
-    """
-    返回每个 Step line 中最后一个数字的字符区间。
-    例如：
-    Step 4: 3 + 9 = 12
-    只返回 12 的 span。
-    """
+
     spans = []
     step_pattern = re.compile(r"^Step\s*\d+\s*:.*$", flags=re.IGNORECASE | re.MULTILINE)
 
@@ -347,13 +336,13 @@ def compute_stepwise_logits(
     tokenizer,
     prompt: str,
     output_text: str,
-    output_token_ids,           # generate_one 返回的 new_token_ids (1-D tensor)
+    output_token_ids,          
 ):
     step_spans = extract_step_answer_spans(output_text)
     if not step_spans:
         return [], [], [], []
 
-    # --- 1. 拼接 token ids，做一次前向 ---
+
     prompt_ids = tokenizer(
         prompt, return_tensors="pt", add_special_tokens=True
     )["input_ids"]
@@ -374,7 +363,7 @@ def compute_stepwise_logits(
     token_logprobs   = log_probs.gather(1, target_ids.unsqueeze(1)).squeeze(1)
     token_raw_logits = shifted_logits.gather(1, target_ids.unsqueeze(1)).squeeze(1)
 
-    # --- 2. 用前缀解码重建每个 output token 的字符区间 ---
+
     output_ids_list = output_token_ids.cpu().tolist()
     n_output = len(output_ids_list)
 
@@ -387,23 +376,17 @@ def compute_stepwise_logits(
         token_char_spans.append((len(prev_decoded), len(cur_decoded)))
         prev_decoded = cur_decoded
 
-    # --- 3. 修正前导空格偏移 ---
-    # output_text 可能以空格开头（'▁Step' decode 的副产品），
-    # 而 tokenizer.decode 会吞掉这个前导空格，导致坐标差 1。
-    full_decoded   = prev_decoded          # decode 完整 output token 序列
-    leading_offset = len(output_text) - len(output_text.lstrip(" "))
-    # 验证（可选 debug）：
-    # assert output_text[leading_offset:] == full_decoded, \
-    #     f"mismatch: {repr(output_text)} vs {repr(full_decoded)}"
 
-    # --- 4. 匹配并收集 logprob ---
+    full_decoded   = prev_decoded          # decode output token
+    leading_offset = len(output_text) - len(output_text.lstrip(" "))
+
     step_logprobs_out   = []
     step_probs_out      = []
     step_raw_logits_out = []
     step_num_tokens_out = []
 
     for ans_text, char_start, char_end in step_spans:
-        # 把 output_text 坐标 → decode 坐标
+
         adj_start = char_start - leading_offset
         adj_end   = char_end   - leading_offset
 
@@ -444,7 +427,7 @@ def evaluate_one_output(
     prompt: str,
     raw_output: str,
     n_shot: int,
-    output_token_ids=None,      # 新增
+    output_token_ids=None,      
     model=None,
     tokenizer=None,
 ) -> EvalResult:
@@ -464,7 +447,7 @@ def evaluate_one_output(
             tokenizer=tokenizer,
             prompt=prompt,
             output_text=raw_output,
-            output_token_ids=output_token_ids,   # 新增
+            output_token_ids=output_token_ids,   
         )
     else:
         step_logprobs, step_probs, step_raw_logits, step_num_tokens = [], [], [], []
@@ -490,7 +473,7 @@ def evaluate_one_output(
 
 
 # =========================
-# 汇总统计
+# summary
 # =========================
 def safe_mean(xs: List[float]) -> float:
     xs = [x for x in xs if not math.isnan(x)]
@@ -566,16 +549,16 @@ def summarize_results(results: List[EvalResult], cot_type: str):
 
 
 # =========================
-# 主程序
+# main
 # =========================
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model", type=str, default="llama3.2-3b")
-    parser.add_argument("--lora_path", type=str, default="llama3.2_lora_claude_final_final_0213")
+    parser.add_argument("--lora_path", type=str, default="your path")
     parser.add_argument("--num_test", type=int, default=40)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--max_new_tokens", type=int, default=256)
-    parser.add_argument("--save_dir", type=str, default="cot_eval_with_logit_ood")
+    parser.add_argument("--save_dir", type=str, default="your path")
     args = parser.parse_args()
 
     os.makedirs(args.save_dir, exist_ok=True)
@@ -608,20 +591,20 @@ def main():
             result = evaluate_one_output(
     ex=ex, prompt=prompt, raw_output=raw_output,
     n_shot=n_shot, model=model, tokenizer=tokenizer,
-    output_token_ids=output_token_ids,   # 新增
+    output_token_ids=output_token_ids,   
 )
             all_results.append(result)
     
             if (idx + 1) % 10 == 0:
                 print(f"[{cot_type}][{n_shot}-shot] done {idx + 1}/{len(test_examples)}")
 
-    # 保存明细
+
     detail_path = os.path.join(args.save_dir, "detail_results.jsonl")
     with open(detail_path, "w", encoding="utf-8") as f:
         for r in all_results:
             f.write(json.dumps(asdict(r), ensure_ascii=False) + "\n")
 
-    # 保存汇总
+
     summary = {
         "id": summarize_results(all_results, "id"),
         "ood": summarize_results(all_results, "ood"),
