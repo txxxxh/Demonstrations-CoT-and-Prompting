@@ -41,10 +41,7 @@ def set_seed(seed: int) -> None:
 
 
 def sample_n_digit_number(n: int) -> int:
-    """
-    生成恰好 n 位的正整数。
-    例如 n=6，则范围是 [100000, 999999]
-    """
+
     assert n >= 1
     low = 10 ** (n - 1)
     high = 10 ** n - 1
@@ -56,10 +53,7 @@ def build_question(a: int, b: int) -> str:
 
 
 def build_train_messages(a: int, b: int) -> List[Dict[str, str]]:
-    """
-    训练时使用的 chat messages。
-    assistant 只输出最终答案。
-    """
+
     answer = a + b
     return [
         {"role": "system", "content": SYSTEM_PROMPT},
@@ -69,9 +63,7 @@ def build_train_messages(a: int, b: int) -> List[Dict[str, str]]:
 
 
 def build_eval_messages(a: int, b: int) -> List[Dict[str, str]]:
-    """
-    推理评测时的 chat messages。
-    """
+
     return [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": build_question(a, b)},
@@ -93,10 +85,7 @@ def load_jsonl(path: str) -> List[Dict]:
 
 
 def extract_first_integer(text: str) -> Optional[int]:
-    """
-    从模型输出中提取第一个整数。
-    模型偶尔会多输出内容，所以这里做稳健解析。
-    """
+
     match = re.search(r"-?\d+", text)
     if match is None:
         return None
@@ -108,10 +97,7 @@ def load_model_and_tokenizer(
     lora_path: Optional[str] = None,
     load_in_4bit: bool = False,
 ):
-    """
-    加载本地 base model；如果给了 lora_path，则再叠加本地 LoRA adapter。
-    强制只从本地加载，不访问 Hugging Face。
-    """
+
     from transformers import BitsAndBytesConfig
 
     tokenizer = AutoTokenizer.from_pretrained(
@@ -171,7 +157,7 @@ def generate_one_answer(model, tokenizer, a: int, b: int, max_new_tokens: int = 
             eos_token_id=tokenizer.eos_token_id,
         )
 
-    # 解码生成
+
     output_text = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
     pred = extract_first_integer(output_text)
     return output_text, pred
