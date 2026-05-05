@@ -1,1 +1,3 @@
-In this experiment we use the same shakespeare data from https://github.com/lee-ny/teaching_arithmetic.
+We use the shakespeare dataset from the `lee-ny/teaching_arithmetic` repository:
+https://github.com/lee-ny/teaching_arithmetic.
+The data file is included here only for experimental reproducibility.
