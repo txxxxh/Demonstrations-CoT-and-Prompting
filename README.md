@@ -1,13 +1,5 @@
 # Demonstrations-CoT-and-Prompting-A-Theoretical-Analysis-of-ICL
 
-This repository contains the official implementation accompanying the paper:
-
-> **Demonstrations, CoT, and Prompting: A Theoretical Analysis of ICL**  
-> Xuhan Tong, Yuchen Zeng, Jiawei Zhang  
-> arXiv 2026
-
----
-
 ## Overview
 
 This work develops a unified theoretical framework for understanding in-context learning (ICL) under:
@@ -31,7 +23,7 @@ This repository contains the experimental code used to support the theoretical r
 
 The experiments are organized by section of the paper.
 
-### 1. Intrinsic ICL Capability
+### 1. Intrinsic ICL Capability and Distribution
 
 Key features:
 
@@ -76,7 +68,7 @@ See Section 2 and 3.
 
 ---
 
-### 5. Ptompting Templates and Instruction Variations
+### 5. Prompting Templates and Instruction Variations
 
 We analyze the effect of 6 different types of prompting templates, consisting:
 
@@ -86,18 +78,3 @@ We analyze the effect of 6 different types of prompting templates, consisting:
 
 This corresponds to Section 4 and 5.
 
----
-
-## Citation
-
-If you find this work useful, please cite: 
-
-@misc{tong2026,
-      title={Demonstrations, CoT, and Prompting: A Theoretical Analysis of ICL}, 
-      author={Xuhan Tong and Yuchen Zeng and Jiawei Zhang},
-      year={2026},
-      eprint={2603.19611},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2603.19611}, 
-}
