@@ -27,8 +27,8 @@ def evaluate_dataset(
     results = []
 
     print("=" * 80)
-    print(f"开始评测: {split_name}")
-    print(f"样本数: {total}")
+    print(f"start evaluation: {split_name}")
+    print(f"examples: {total}")
     print("=" * 80)
 
     for idx, item in enumerate(tqdm(dataset, desc=f"Evaluating {split_name}")):
@@ -82,9 +82,9 @@ def evaluate_dataset(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="评测 llama3.2-3b 加法准确率")
+    parser = argparse.ArgumentParser(description="addition evaluation")
     parser.add_argument("--base_model", type=str, default="llama3.2_lora")
-    parser.add_argument("--lora_path", type=str, default=None, help="LoRA adapter 路径；不填则评测 base model")
+    parser.add_argument("--lora_path", type=str, default=None, help="LoRA adapter")
     parser.add_argument("--eval6_file", type=str, default="eval_add_6digit.jsonl")
     parser.add_argument("--eval7_file", type=str, default="eval_add_7digit.jsonl")
     parser.add_argument("--output_dir", type=str, default="eval_results_lora.jsonl")
@@ -97,7 +97,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
 
     print("=" * 80)
-    print("加载模型中...")
+    print("Loading...")
     print(f"Base model: {args.base_model}")
     print(f"LoRA path: {args.lora_path}")
     print(f"Load in 4bit: {args.load_in_4bit}")
@@ -150,7 +150,7 @@ def main():
     )
 
     print("\n" + "=" * 80)
-    print("评测完成")
+    print("evaluation finishes")
     print(json.dumps(final_summary, ensure_ascii=False, indent=2))
     print("=" * 80)
 
