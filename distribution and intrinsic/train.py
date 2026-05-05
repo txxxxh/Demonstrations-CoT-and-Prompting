@@ -87,9 +87,7 @@ def build_train_text(
     output: str,
     system: Optional[str] = None,
 ) -> str:
-    """
-    手动拼训练文本，不使用 chat_template。
-    """
+
     sys_prompt = system if system else SYSTEM_PROMPT
 
     return (
@@ -105,14 +103,14 @@ def convert_records_to_text_dataset(records: List[Dict]) -> Dataset:
     texts = []
 
     for idx, item in enumerate(records):
-        # 支持 generate.py 的 instruction/input/output 格式
+
         if "instruction" in item and "input" in item and "output" in item:
             instruction = item["instruction"]
             input_text = item["input"]
             output = str(item["output"])
             system = item.get("system", None)
 
-        # 兼容旧格式 question/answer
+
         elif "question" in item and "answer" in item:
             instruction = "Calculate the following addition problem."
             input_text = (
@@ -267,16 +265,16 @@ def main():
 
     if not os.path.isfile(os.path.join(args.base_model, "config.json")):
         raise FileNotFoundError(
-            f"{args.base_model} 下没有 config.json，这不是完整的本地模型目录"
+            f"{args.base_model} has no config.json."
         )
 
     if not os.path.isfile(args.train_file):
-        raise FileNotFoundError(f"训练文件不存在: {args.train_file}")
+        raise FileNotFoundError(f"no such file: {args.train_file}")
 
     os.makedirs(args.output_dir, exist_ok=True)
 
     print("=" * 80)
-    print("训练配置")
+    print("training config")
     print(f"Base model:             {args.base_model}")
     print(f"Train file:             {args.train_file}")
     print(f"Output dir:             {args.output_dir}")
@@ -420,8 +418,7 @@ def main():
         weight_decay=args.weight_decay,
         logging_steps=args.logging_steps,
 
-        # 这里关闭 HF 自动频繁保存，避免生成太多 checkpoint。
-        # 我们用 callback 专门保存 1000cpt / 3000cpt。
+
         save_strategy="no",
 
         bf16=torch.cuda.is_available(),
