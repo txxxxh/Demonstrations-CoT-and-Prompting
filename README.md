@@ -37,7 +37,7 @@ This setup corresponds to Section 2 of the paper.
 
 ### 2.  The Quality of Selected Demonstrations
 
-We design two tasks for investigating the effect of demonstration choice. We construct two types of demonstrations: identifying and ambiguous.
+We design two tasks for investigating the effect of demonstration choice. We construct two types of demonstrations: identifying and ambiguous.
 
 - Task 1. Sport Identification
 - Task 2. Person Identification
